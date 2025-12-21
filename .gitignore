@@ -1,2 +1,8 @@
 .env
 .venv
+extenv
+report.png
+test_ollama_request.py
+test_gemini_request.py
+test_request.py
+test_image.png

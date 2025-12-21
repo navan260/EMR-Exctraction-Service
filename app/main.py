@@ -1,7 +1,8 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from app import ocr_engine, ie_engine
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 import uvicorn
 import io
+
+from . import ocr_engine, ie_engine
 
 app = FastAPI(title="Extraction Service", description="Extracts text and entities from medical images.")
 
@@ -9,11 +10,11 @@ app = FastAPI(title="Extraction Service", description="Extracts text and entitie
 async def startup_event():
     """Initialize models on startup."""
     ocr_engine.init_ocr()
-    ie_engine.init_model()
+    # ie_engine.init_model()
     ie_engine.init_gemini()
 
 @app.post("/extract")
-async def extract_endpoint(file: UploadFile = File(...), use_gemini: bool = False, use_ollama: bool = False):
+async def extract_endpoint(file: UploadFile = File(...), use_gemini: bool = Form(...), use_ollama: bool = Form(...)):
     """
     Endpoint to accept an image file, extract text, and identify entities.
     Optional 'use_gemini' flag to use Google's Gemini API for extraction.
