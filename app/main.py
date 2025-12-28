@@ -1,10 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 import uvicorn
 import io
+import json
 
-from . import ocr_engine, ie_engine
+from fastapi.responses import StreamingResponse
+from typing import List
+from . import ocr_engine
+from . import ie_engine
 
-app = FastAPI(title="Extraction Service", description="Extracts text and entities from medical images.")
+app = FastAPI(title="Extraction Service", description="Extracts text and entities from medical images and PDFs.")
 
 @app.on_event("startup")
 async def startup_event():
@@ -16,12 +20,12 @@ async def startup_event():
 @app.post("/extract")
 async def extract_endpoint(file: UploadFile = File(...), use_gemini: bool = Form(...), use_ollama: bool = Form(...)):
     """
-    Endpoint to accept an image file, extract text, and identify entities.
+    Endpoint to accept an image or PDF file, extract text, and identify entities.
     Optional 'use_gemini' flag to use Google's Gemini API for extraction.
     Optional 'use_ollama' flag to use local Ollama model (default: llama3.2).
     """
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="File must be an image.")
+    if not (file.content_type.startswith("image/") or file.content_type == "application/pdf"):
+        raise HTTPException(status_code=400, detail="File must be an image or PDF.")
     
     try:
         # Read file content
@@ -39,14 +43,51 @@ async def extract_endpoint(file: UploadFile = File(...), use_gemini: bool = Form
         else:
              entities = ie_engine.extract_entities(raw_text)
         
-        return {
-            "filename": file.filename,
-            "raw_text": raw_text,
-            "entities": entities
-        }
+        return entities
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/extract_batch")
+async def extract_batch_endpoint(
+    files: List[UploadFile] = File(...),
+    use_gemini: bool = Form(...),
+    use_ollama: bool = Form(...)
+):
+    """
+    Accepts multiple files and streams extraction results one by one (SSE).
+    """
+    async def process_files():
+        for file in files:
+            result = {}
+            try:
+                if not (file.content_type.startswith("image/") or file.content_type == "application/pdf"):
+                    result = {"error": f"File {file.filename} is not an image or PDF."}
+                else:
+                    contents = await file.read()
+                    
+                    # Step 1: OCR
+                    raw_text = ocr_engine.extract_text(contents)
+                    
+                    # Step 2: IE
+                    if use_gemini:
+                        entities = ie_engine.extract_with_gemini(raw_text)
+                    elif use_ollama:
+                        entities = ie_engine.extract_with_ollama(raw_text)
+                    else:
+                        entities = ie_engine.extract_entities(raw_text)
+                    
+                    result = entities
+            except Exception as e:
+                result = {"error": f"Error processing {file.filename}: {str(e)}"}
+            
+            # Attach filename to result
+            if isinstance(result, dict):
+                result["_filename"] = file.filename
+                
+            yield f"data: {json.dumps(result)}\n\n"
+
+    return StreamingResponse(process_files(), media_type="text/event-stream")
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)

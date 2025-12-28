@@ -192,6 +192,9 @@ PROMPTS = {
     Extract the following entities:
     - **PII**: Patient Name, DOB, Patient ID, Date of Report.
     - **Disease_disorder**: Any medical condition, illness, disease, or diagnosis.
+    - **Symptoms**: Any symptoms or complaints.
+    - **Clinical_finding_names**: Any clinical finding names.
+    - **Clinical_finding_values**: Any clinical finding values.
     - **Medication**: Any drug or pharmaceutical product.
     - **Dosage**: The strength, frequency, or amount of a medication.
     - **Procedure**: Any medical test, surgery, or diagnostic procedure.
@@ -201,6 +204,9 @@ PROMPTS = {
       "Document_Type": "Medical Report",
       "PII": {"Name": "...", "DOB": "...", "ID": "...", "Date": "..."},
       "Disease_disorder": ["..."],
+      "Symptoms": ["..."],
+      "Clinical_finding_names": ["..."],
+      "Clinical_finding_values": ["..."],
       "Medication": ["..."],
       "Dosage": ["..."],
       "Procedure": ["..."]

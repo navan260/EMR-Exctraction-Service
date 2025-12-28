@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import io
 import cv2
+import fitz # PyMuPDF
 
 # Global reader instance to avoid reloading model on every request
 reader = None
@@ -46,6 +47,23 @@ def extract_text(image_bytes: bytes) -> str:
         init_ocr()
     
     try:
+        # Check for PDF signature
+        if image_bytes.startswith(b'%PDF'):
+            doc = fitz.open(stream=image_bytes, filetype="pdf")
+            full_text = []
+            for page in doc:
+                pix = page.get_pixmap(dpi=300) 
+                img_data = pix.tobytes("png")
+                
+                # Preprocess
+                processed_image = preprocess_image(img_data)
+                
+                # detail=0 returns just the text list
+                result = reader.readtext(processed_image, detail=0)
+                full_text.extend(result)
+            print(" ".join(full_text))
+            return " ".join(full_text)
+
         # Preprocess the image
         processed_image = preprocess_image(image_bytes)
         

@@ -10,3 +10,4 @@ opencv-python
 google-generativeai
 python-dotenv
 ollama
+pymupdf

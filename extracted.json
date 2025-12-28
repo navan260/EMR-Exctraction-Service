@@ -1,0 +1,26 @@
+{
+    "filename": "report.png",
+    "raw_text": "Medical Reports of Patients Patient Information: Name: Emily Johnson Date of Birth: 01/15/1989 Patient ID: 987654321 Date of Report: 03/10/2024 Referring Physician: Dr Alan Green, MD Specialty: Cardiology Contact Information: [Physician's Contact Information] Introduction: This medica report is prepared for Emily Johnson, following her consultation and comprehensive evaluation in our cardiology department on 03/08/2024. The purpose of this report is to document Ms. Johnson's current cardiac health status and outline the management plan recommended based on our findings_ Medical History: Ms. Johnson has a history of hypertension; diagnosed three years ag0, which she has been managing with medication She has no known drug allergies Family history reveals her father had coronary artery disease. She is non-smoker and maintains a generally active lifestyle. Presenting Complaints: Ms. Johnson presented with intermittent chest pain, primarily on exertion, and occasional episodes of palpitations over the last two months. She also reported shortness of breath during her regular jogging sessions; which was previously well-tolerated. Diagnostic Tests Conducted: Copyright @ Sample Templates com",
+    "entities": {
+        "Document_Type": "Medical Report",
+        "PII": {
+            "Name": "Emily Johnson",
+            "DOB": "01/15/1989",
+            "ID": "987654321",
+            "Date": "03/10/2024"
+        },
+        "Disease_disorder": [
+            "hypertension",
+            "coronary artery disease",
+            "chest pain",
+            "palpitations",
+            "shortness of breath"
+        ],
+        "Medication": [],
+        "Dosage": [],
+        "Procedure": [
+            "consultation",
+            "comprehensive evaluation"
+        ]
+    }
+}
