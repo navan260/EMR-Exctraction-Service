@@ -117,7 +117,10 @@ def extract_with_ollama(text: str, model_name: str = "llama3") -> dict:
         return {"error": str(e)}
 
 # Load environment variables
-load_dotenv()
+from pathlib import Path
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+print(f"Loading .env from: {env_path}")
 
 # Global pipeline instance
 ner_pipeline = None
